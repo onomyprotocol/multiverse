@@ -35,3 +35,34 @@ jobs:
           go install mvdan.cc/gofumpt@latest
           test -z "$(gofumpt -d -e -extra . | tee /dev/stderr)"
           go test ./...
+          cargo r --bin clean
+
+  rustfmt:
+    name: Rustfmt
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      # Acquire the most recent nightly with a rustfmt component
+      - name: Install most recent Rustfmt
+        run: |
+          rustup set profile minimal
+          rustup default "nightly-$(curl -s https://rust-lang.github.io/rustup-components-history/x86_64-unknown-linux-gnu/rustfmt)"
+          rustup component add rustfmt
+      - name: Run `cargo fmt`
+        run: |
+          cargo fmt -- --check
+
+  clippy:
+    name: Clippy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      # Acquire the most recent nightly with a clippy component
+      - name: Install most recent Clippy
+        run: |
+          rustup set profile minimal
+          rustup default "nightly-$(curl -s https://rust-lang.github.io/rustup-components-history/x86_64-unknown-linux-gnu/clippy)"
+          rustup component add clippy
+      - name: Run `cargo clippy`
+        run: |
+          cargo clippy --all --all-targets --all-features -- -D clippy::all
