@@ -112,9 +112,9 @@ import (
 )
 
 const (
-	AppName              = "interchain-security-cd"
-	upgradeName          = "v07-Theta"
-	AccountAddressPrefix = "cosmos"
+	AppName              = "appname"
+	upgradeName          = "v0.1.0"
+	AccountAddressPrefix = "onomy"
 )
 
 var (
@@ -224,7 +224,7 @@ func init() {
 		stdlog.Println("Failed to get home dir %2", err)
 	}
 
-	DefaultNodeHome = filepath.Join(userHomeDir, "."+AppName)
+	DefaultNodeHome = filepath.Join(userHomeDir, ".onomy_"+AppName)
 }
 
 // New returns a reference to an initialized App.
