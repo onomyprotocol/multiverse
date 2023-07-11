@@ -35,6 +35,7 @@ jobs:
           go install mvdan.cc/gofumpt@latest
           test -z "$(gofumpt -d -e -extra . | tee /dev/stderr)"
           go test ./...
+          cargo r --bin ics_with_onomyd
           cargo r --bin clean
 
   rustfmt:

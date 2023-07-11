@@ -2,6 +2,7 @@ package app
 
 import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	crisistypes "github.com/cosmos/cosmos-sdk/x/crisis/types"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
@@ -35,6 +36,8 @@ type paramChangeKey struct {
 }
 
 var WhitelistedParams = map[paramChangeKey]struct{}{
+	// crisis
+	{Subspace: crisistypes.ModuleName, Key: "ConstantFee"}: {},
 	// bank
 	{Subspace: banktypes.ModuleName, Key: "SendEnabled"}: {},
 	// governance
