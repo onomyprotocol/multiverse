@@ -26,7 +26,7 @@ use onomy_test_lib::{
 };
 use tokio::time::sleep;
 
-const CONSUMER_ID: &str = "appname";
+const CONSUMER_ID: &str = "haven";
 const PROVIDER_ACCOUNT_PREFIX: &str = "onomy";
 const CONSUMER_ACCOUNT_PREFIX: &str = "onomy";
 
@@ -44,7 +44,7 @@ async fn main() -> Result<()> {
     } else {
         sh("go build ./cmd/consumer-democracy", &[]).await?;
         sh(
-            "cp ./consumer-democracy ./tests/dockerfiles/dockerfile_resources/appnamed",
+            "cp ./consumer-democracy ./tests/dockerfiles/dockerfile_resources/havend",
             &[],
         )
         .await?;
@@ -104,19 +104,19 @@ async fn container_runner(args: &Args) -> Result<()> {
                 "/root/.onomy/keyring-test",
             )]),
             Container::new(
-                "appnamed",
+                "havend",
                 Dockerfile::Contents(onomy_std_cosmos_daemon(
-                    "appnamed",
-                    ".onomy_appname",
+                    "havend",
+                    ".onomy_haven",
                     "v0.1.0",
-                    "appnamed",
+                    "havend",
                 )),
                 entrypoint,
                 &["--entry-name", "consumer"],
             )
             .volumes(&[(
                 "./tests/resources/keyring-test",
-                "/root/.onomy_appname/keyring-test",
+                "/root/.onomy_haven/keyring-test",
             )]),
         ],
         Some(dockerfiles_dir),

@@ -109,10 +109,14 @@ import (
 
 	// unnamed import of statik for swagger UI support
 	_ "github.com/cosmos/cosmos-sdk/client/docs/statik"
+
+	havenmodule "github.com/onomyprotocol/haven/x/haven"
+	havenmodulekeeper "github.com/onomyprotocol/haven/x/haven/keeper"
+	havenmoduletypes "github.com/onomyprotocol/haven/x/haven/types"
 )
 
 const (
-	AppName              = "appname"
+	AppName              = "haven"
 	upgradeName          = "v0.1.0"
 	AccountAddressPrefix = "onomy"
 )
@@ -147,6 +151,7 @@ var (
 		vesting.AppModuleBasic{},
 		// router.AppModuleBasic{},
 		consumer.AppModuleBasic{},
+		havenmodule.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -204,6 +209,7 @@ type App struct { // nolint: golint
 	FeeGrantKeeper   feegrantkeeper.Keeper
 	AuthzKeeper      authzkeeper.Keeper
 	ConsumerKeeper   consumerkeeper.Keeper
+	HavenKeeper      havenmodulekeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper         capabilitykeeper.ScopedKeeper
@@ -256,6 +262,7 @@ func New(
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey,
 		capabilitytypes.StoreKey, authzkeeper.StoreKey,
 		consumertypes.StoreKey,
+		havenmoduletypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -451,6 +458,14 @@ func New(
 	transferModule := transfer.NewAppModule(app.TransferKeeper)
 	ibcmodule := transfer.NewIBCModule(app.TransferKeeper)
 
+	app.HavenKeeper = *havenmodulekeeper.NewKeeper(
+		appCodec,
+		keys[havenmoduletypes.StoreKey],
+		keys[havenmoduletypes.MemStoreKey],
+		app.GetSubspace(havenmoduletypes.ModuleName),
+	)
+	havenModule := havenmodule.NewAppModule(appCodec, app.HavenKeeper, app.AccountKeeper, app.BankKeeper)
+
 	// create static IBC router, add transfer route, then set and seal it
 	ibcRouter := porttypes.NewRouter()
 	ibcRouter.AddRoute(ibctransfertypes.ModuleName, ibcmodule)
@@ -490,6 +505,7 @@ func New(
 		ibc.NewAppModule(app.IBCKeeper),
 		transferModule,
 		consumerModule,
+		havenModule,
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -518,6 +534,7 @@ func New(
 		ibctransfertypes.ModuleName,
 		ibchost.ModuleName,
 		consumertypes.ModuleName,
+		havenmoduletypes.ModuleName,
 	)
 	app.MM.SetOrderEndBlockers(
 		crisistypes.ModuleName,
@@ -538,6 +555,7 @@ func New(
 		ibctransfertypes.ModuleName,
 		ibchost.ModuleName,
 		consumertypes.ModuleName,
+		havenmoduletypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -565,6 +583,7 @@ func New(
 		ibchost.ModuleName,
 		ibctransfertypes.ModuleName,
 		consumertypes.ModuleName,
+		havenmoduletypes.ModuleName,
 	)
 
 	app.MM.RegisterInvariants(&app.CrisisKeeper)
@@ -591,6 +610,7 @@ func New(
 		evidence.NewAppModule(app.EvidenceKeeper), ibc.NewAppModule(app.IBCKeeper),
 		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
 		transferModule,
+		havenModule,
 	)
 
 	app.sm.RegisterStoreDecoders()
@@ -899,6 +919,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
 	paramsKeeper.Subspace(consumertypes.ModuleName)
+	paramsKeeper.Subspace(havenmoduletypes.ModuleName)
 
 	return paramsKeeper
 }
