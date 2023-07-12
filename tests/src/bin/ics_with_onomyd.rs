@@ -16,6 +16,7 @@ use onomy_test_lib::{
         hermes_set_gas_price_denom, hermes_start, sh_hermes, write_hermes_config,
         HermesChainConfig, IbcPair,
     },
+    market::{CoinPair, Market},
     onomy_std_init, reprefix_bech32,
     setups::{
         cosmovisor_add_consumer, marketd_setup, onomyd_setup, test_proposal, CosmosSetupOptions,
@@ -27,9 +28,11 @@ use onomy_test_lib::{
         stacked_errors::{Error, Result, StackableErr},
         FileOptions, STD_DELAY, STD_TRIES,
     },
-    token18, u64_array_bigints,
-    u64_array_bigints::u256,
-    yaml_str_to_json_value, Args, ONOMY_IBC_NOM, TIMEOUT,
+    token18,
+    u64_array_bigints::{
+        u256, {self},
+    },
+    yaml_str_to_json_value, Args, ONOMY_IBC_NOM, TEST_AMOUNT, TIMEOUT,
 };
 use tokio::time::sleep;
 
@@ -210,9 +213,9 @@ async fn onomyd_runner(args: &Args) -> Result<()> {
             .stack()
             .stack()?;
 
-    let mnemonic = onomyd_setup(CosmosSetupOptions::new(daemon_home))
-        .await
-        .stack()?;
+    let mut options = CosmosSetupOptions::new(daemon_home);
+    options.large_test_amount = true;
+    let mnemonic = onomyd_setup(options).await.stack()?;
     // send mnemonic to hermes
     nm_hermes.send::<String>(&mnemonic).await.stack()?;
 
@@ -268,7 +271,7 @@ async fn onomyd_runner(args: &Args) -> Result<()> {
         .cosmovisor_ibc_transfer(
             "validator",
             &reprefix_bech32(addr, CONSUMER_ACCOUNT_PREFIX).stack()?,
-            &token18(5.0e3, ""),
+            &TEST_AMOUNT.checked_short_divide(5).unwrap().0.to_string(),
             "anom",
         )
         .await
@@ -401,6 +404,56 @@ async fn consumer(args: &Args) -> Result<()> {
         .await
         .stack()?;
     wait_for_num_blocks(4).await.stack()?;
+
+    // market module specific sanity checks (need to check all tx commands
+    // specifically to make sure permissions are correct)
+
+    let coin_pair = CoinPair::new("anative", ibc_nom).stack()?;
+    let mut market = Market::new("validator", &format!("1000000{ibc_nom}"));
+    market.gas = Some("300000".to_owned());
+    market
+        .create_pool(&coin_pair, Market::MAX_COIN, Market::MAX_COIN)
+        .await
+        .stack()?;
+    market
+        .create_drop(&coin_pair, Market::MAX_COIN_SQUARED)
+        .await
+        .stack()?;
+    market.show_pool(&coin_pair).await.stack()?;
+    market.show_members(&coin_pair).await.stack()?;
+    market
+        .market_order(
+            coin_pair.coin_a(),
+            coin_pair.coin_b(),
+            Market::MAX_COIN,
+            5000,
+        )
+        .await
+        .stack()?;
+    market.redeem_drop(1).await.stack()?;
+    market
+        .create_order(
+            coin_pair.coin_a(),
+            coin_pair.coin_b(),
+            "stop",
+            Market::MAX_COIN,
+            (1100, 900),
+            (0, 0),
+        )
+        .await
+        .stack()?;
+    market
+        .create_order(
+            coin_pair.coin_a(),
+            coin_pair.coin_b(),
+            "limit",
+            Market::MAX_COIN,
+            (1100, 900),
+            (0, 0),
+        )
+        .await
+        .stack()?;
+    market.cancel_order(5).await.stack()?;
 
     let pubkey = sh_cosmovisor("tendermint show-validator", &[])
         .await
