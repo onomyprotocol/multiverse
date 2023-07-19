@@ -1,6 +1,8 @@
 use std::time::Duration;
 
-use common::dockerfile_onomyd;
+use common::{
+    dockerfile_onomyd, CONSUMER_ACCOUNT_PREFIX, CONSUMER_ID, CONSUMER_TYPE, PROVIDER_ACCOUNT_PREFIX,
+};
 use log::info;
 use onomy_test_lib::{
     cosmovisor::{
@@ -26,10 +28,6 @@ use onomy_test_lib::{
 };
 use tokio::time::sleep;
 
-const CONSUMER_ID: &str = "appname";
-const PROVIDER_ACCOUNT_PREFIX: &str = "onomy";
-const CONSUMER_ACCOUNT_PREFIX: &str = "onomy";
-
 #[tokio::main]
 async fn main() -> Result<()> {
     let args = onomy_std_init()?;
@@ -42,9 +40,11 @@ async fn main() -> Result<()> {
             _ => format!("entry_name \"{s}\" is not recognized").map_add_err(|| ()),
         }
     } else {
-        sh("go build ./cmd/consumer-democracy", &[]).await?;
+        sh(&format!("go build ./cmd/{CONSUMER_TYPE}"), &[]).await?;
         sh(
-            "cp ./consumer-democracy ./tests/dockerfiles/dockerfile_resources/appnamed",
+            &format!(
+                "cp ./{CONSUMER_TYPE} ./tests/dockerfiles/dockerfile_resources/{CONSUMER_ID}d"
+            ),
             &[],
         )
         .await?;
@@ -104,19 +104,19 @@ async fn container_runner(args: &Args) -> Result<()> {
                 "/root/.onomy/keyring-test",
             )]),
             Container::new(
-                "appnamed",
+                &format!("{CONSUMER_ID}d"),
                 Dockerfile::Contents(onomy_std_cosmos_daemon(
-                    "appnamed",
-                    ".onomy_appname",
+                    &format!("{CONSUMER_ID}d"),
+                    &format!(".onomy_{CONSUMER_ID}"),
                     "v0.1.0",
-                    "appnamed",
+                    &format!("{CONSUMER_ID}d"),
                 )),
                 entrypoint,
                 &["--entry-name", "consumer"],
             )
             .volumes(&[(
                 "./tests/resources/keyring-test",
-                "/root/.onomy_appname/keyring-test",
+                &format!("/root/.onomy_{CONSUMER_ID}/keyring-test"),
             )]),
         ],
         Some(dockerfiles_dir),
@@ -331,6 +331,10 @@ async fn consumer(args: &Args) -> Result<()> {
         PROVIDER_ACCOUNT_PREFIX,
     )?;
     info!("sending back to {}", test_addr);
+
+    // there seems to be some kind of race condition with account numbers, is it the
+    // hermes relayer conflicting?
+    wait_for_num_blocks(1).await?;
 
     // send some IBC NOM back to origin chain using it as gas
     ibc_pair
