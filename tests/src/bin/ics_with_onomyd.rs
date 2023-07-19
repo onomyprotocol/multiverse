@@ -14,7 +14,7 @@ use onomy_test_lib::{
         HermesChainConfig, IbcPair,
     },
     onomy_std_init, reprefix_bech32,
-    setups::{cosmovisor_add_consumer, marketd_setup, onomyd_setup},
+    setups::{cosmovisor_add_consumer, marketd_setup, onomyd_setup, test_proposal},
     super_orchestrator::{
         docker::{Container, ContainerNetwork, Dockerfile},
         net_message::NetMessenger,
@@ -151,7 +151,7 @@ async fn hermes_runner(args: &Args) -> Result<()> {
     // wait for setup
     nm_onomyd.recv::<()>().await?;
 
-    let ibc_pair = IbcPair::hermes_setup_pair(CONSUMER_ID, "onomy").await?;
+    let ibc_pair = IbcPair::hermes_setup_ics_pair(CONSUMER_ID, "onomy").await?;
     let mut hermes_runner = hermes_start("/logs/hermes_bootstrap_runner.log").await?;
     ibc_pair.hermes_check_acks().await?;
 
@@ -194,7 +194,12 @@ async fn onomyd_runner(args: &Args) -> Result<()> {
 
     let mut cosmovisor_runner = cosmovisor_start("onomyd_runner.log", None).await?;
 
-    let ccvconsumer_state = cosmovisor_add_consumer(daemon_home, consumer_id).await?;
+    let ccvconsumer_state = cosmovisor_add_consumer(
+        daemon_home,
+        consumer_id,
+        &test_proposal(consumer_id, "anative"),
+    )
+    .await?;
 
     // send to consumer
     nm_consumer.send::<String>(&ccvconsumer_state).await?;
