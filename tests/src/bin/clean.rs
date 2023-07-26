@@ -11,7 +11,12 @@ async fn main() -> Result<()> {
     remove_files_in_dir("./", &["consumer-democracy"]).await?;
     remove_files_in_dir("./tests/dockerfiles", &["__tmp.dockerfile"]).await?;
     remove_files_in_dir("./tests/dockerfiles/dockerfile_resources", &[
-        "onomyd", "onexd", "appnamed",
+        "onomyd",
+        "onexd",
+        "appnamed",
+        "__tmp_hermes_config.toml",
+        "havend",
+        "arc_ethd",
     ])
     .await?;
     remove_files_in_dir("./tests/logs", &[".log", ".json", ".toml"]).await?;
