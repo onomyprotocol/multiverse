@@ -1,6 +1,8 @@
 use std::time::Duration;
 
-use common::dockerfile_onomyd;
+use common::{
+    dockerfile_onomyd, CONSUMER_ACCOUNT_PREFIX, CONSUMER_ID, CONSUMER_TYPE, PROVIDER_ACCOUNT_PREFIX,
+};
 use log::info;
 use onomy_test_lib::{
     cosmovisor::{
@@ -23,10 +25,6 @@ use onomy_test_lib::{
 };
 use serde_json::{json, Value};
 use tokio::time::sleep;
-
-const CONSUMER_ID: &str = "haven";
-const PROVIDER_ACCOUNT_PREFIX: &str = "onomy";
-const CONSUMER_ACCOUNT_PREFIX: &str = "onomy";
 
 const IBC_KUDOS: &str = "ibc/1A9CC9E90B4706CE7C3460CB138F0839B8A0B129C377644D5563428773B879D3";
 const KUDOS_TEST_ADDR: &str = "onomy1y046r7wtrcss63kauwpee5rkmm322fn8twluug";
@@ -95,9 +93,11 @@ async fn main() -> Result<()> {
             _ => format!("entry_name \"{s}\" is not recognized").map_add_err(|| ()),
         }
     } else {
-        sh("go build ./cmd/consumer-democracy", &[]).await?;
+        sh(&format!("go build ./cmd/{CONSUMER_TYPE}"), &[]).await?;
         sh(
-            "cp ./consumer-democracy ./tests/dockerfiles/dockerfile_resources/havend",
+            &format!(
+                "cp ./{CONSUMER_TYPE} ./tests/dockerfiles/dockerfile_resources/{CONSUMER_ID}d"
+            ),
             &[],
         )
         .await?;
@@ -157,19 +157,19 @@ async fn container_runner(args: &Args) -> Result<()> {
                 "/root/.onomy/keyring-test",
             )]),
             Container::new(
-                "havend",
+                &format!("{CONSUMER_ID}d"),
                 Dockerfile::Contents(onomy_std_cosmos_daemon(
-                    "havend",
-                    ".onomy_haven",
+                    &format!("{CONSUMER_ID}d"),
+                    &format!(".onomy_{CONSUMER_ID}"),
                     "v0.1.0",
-                    "havend",
+                    &format!("{CONSUMER_ID}d"),
                 )),
                 entrypoint,
                 &["--entry-name", "consumer"],
             )
             .volumes(&[(
                 "./tests/resources/keyring-test",
-                "/root/.onomy_haven/keyring-test",
+                &format!("/root/.onomy_{CONSUMER_ID}/keyring-test"),
             )]),
         ],
         Some(dockerfiles_dir),
@@ -398,7 +398,11 @@ async fn consumer(args: &Args) -> Result<()> {
     )?;
     info!("sending back to {}", test_addr);
 
-    // send some IBC NOM back to origin chain
+    // there seems to be some kind of race condition with account numbers, is it the
+    // hermes relayer conflicting?
+    wait_for_num_blocks(1).await?;
+
+    // send some IBC NOM back to origin chain using it as gas
     ibc_pair
         .a
         .cosmovisor_ibc_transfer_with_flags(test_addr, &format!("5000{ibc_nom}"), &[
