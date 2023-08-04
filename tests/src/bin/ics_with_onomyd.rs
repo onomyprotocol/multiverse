@@ -15,7 +15,7 @@ use onomy_test_lib::{
     dockerfiles::{dockerfile_hermes, onomy_std_cosmos_daemon},
     hermes::{hermes_start, sh_hermes, write_hermes_config, HermesChainConfig, IbcPair},
     onomy_std_init, reprefix_bech32,
-    setups::{cosmovisor_add_consumer, marketd_setup, onomyd_setup, test_proposal},
+    setups::{cosmovisor_add_consumer, onomyd_setup, test_proposal},
     super_orchestrator::{
         docker::{Container, ContainerNetwork, Dockerfile},
         net_message::NetMessenger,
@@ -438,7 +438,7 @@ async fn consumer(args: &Args) -> Result<()> {
     // we need the initial consumer state
     let ccvconsumer_state_s: String = nm_onomyd.recv().await.stack()?;
 
-    marketd_setup(daemon_home, chain_id, &ccvconsumer_state_s)
+    havend_setup(daemon_home, chain_id, &ccvconsumer_state_s)
         .await
         .stack()?;
 
@@ -602,7 +602,7 @@ async fn consumer(args: &Args) -> Result<()> {
     }}
     "#
         ),
-        &format!("1akudos"),
+        "1akudos",
     )
     .await
     .stack()?;
