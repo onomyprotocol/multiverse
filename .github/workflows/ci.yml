@@ -7,7 +7,21 @@ on:
       - 'main'
 
 jobs:
-  test_suite:
+  go_tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Go 1.x
+        uses: actions/setup-go@v2
+        with:
+          go-version: ^1.19
+        id: go
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: test suite
+        run: |
+          go test ./...
+
+  rust_tests:
     runs-on: ubuntu-latest
     steps:
       - name: Set up Go 1.x
@@ -32,11 +46,23 @@ jobs:
             ${{ runner.os }}-buildx-
       - name: test suite
         run: |
-          go install mvdan.cc/gofumpt@latest
-          test -z "$(gofumpt -d -e -extra . | tee /dev/stderr)"
-          go test ./...
           cargo r --bin ics_with_onomyd
           cargo r --bin clean
+
+  gofumpt:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Go 1.x
+        uses: actions/setup-go@v2
+        with:
+          go-version: ^1.19
+        id: go
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: test suite
+        run: |
+          go install mvdan.cc/gofumpt@latest
+          test -z "$(gofumpt -d -e -extra . | tee /dev/stderr)"
 
   rustfmt:
     name: Rustfmt
