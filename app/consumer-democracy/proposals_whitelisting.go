@@ -9,6 +9,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/params/types/proposal"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	ibctransfertypes "github.com/cosmos/ibc-go/v4/modules/apps/transfer/types"
+	consumertypes "github.com/cosmos/interchain-security/x/ccv/consumer/types"
 )
 
 func IsProposalWhitelisted(content govtypes.Content) bool {
@@ -66,4 +67,10 @@ var WhitelistedParams = map[paramChangeKey]struct{}{
 	{Subspace: ibctransfertypes.ModuleName, Key: "SendEnabled"}:    {},
 	{Subspace: ibctransfertypes.ModuleName, Key: "ReceiveEnabled"}: {},
 	// add interchain account params(HostEnabled, AllowedMessages) once the module is added to the consumer app
+	// ccv params (note: some CCV params should not be configurable or require special coordination with the provider chain)
+	{Subspace: consumertypes.ModuleName, Key: "ProviderRewardDenoms"}:              {},
+	{Subspace: consumertypes.ModuleName, Key: "RewardDenoms"}:                      {},
+	{Subspace: consumertypes.ModuleName, Key: "ConsumerRedistributionFraction"}:    {},
+	{Subspace: consumertypes.ModuleName, Key: "BlocksPerDistributionTransmission"}: {},
+	{Subspace: consumertypes.ModuleName, Key: "TransferTimeoutPeriod"}:             {},
 }
