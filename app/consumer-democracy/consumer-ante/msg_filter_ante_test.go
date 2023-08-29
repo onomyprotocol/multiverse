@@ -6,6 +6,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	ibcclienttypes "github.com/cosmos/ibc-go/v4/modules/core/02-client/types"
+	ibcconnectiontypes "github.com/cosmos/ibc-go/v4/modules/core/03-connection/types"
+	ibcchanneltypes "github.com/cosmos/ibc-go/v4/modules/core/04-channel/types"
 	appconsumer "github.com/onomyprotocol/multiverse/app/consumer-democracy"
 	ante "github.com/onomyprotocol/multiverse/app/consumer-democracy/consumer-ante"
 	"github.com/stretchr/testify/require"
@@ -60,6 +62,51 @@ func TestMsgFilterDecorator(t *testing.T) {
 			consumerKeeper: consumerKeeper{channelExists: true},
 			msgs: []sdk.Msg{
 				&banktypes.MsgSend{},
+			},
+			expectErr: false,
+		},
+		{
+			name:           "invalid pre-CCV MsgConnectionOpenInit",
+			ctx:            sdk.Context{},
+			consumerKeeper: consumerKeeper{channelExists: false},
+			msgs: []sdk.Msg{
+				&ibcconnectiontypes.MsgConnectionOpenInit{ClientId: "07-tendermint-1"},
+			},
+			expectErr: true,
+		},
+		{
+			name:           "valid pre-CCV MsgConnectionOpenInit",
+			ctx:            sdk.Context{},
+			consumerKeeper: consumerKeeper{channelExists: false},
+			msgs: []sdk.Msg{
+				&ibcconnectiontypes.MsgConnectionOpenInit{ClientId: "07-tendermint-0"},
+			},
+			expectErr: false,
+		},
+		{
+			name:           "invalid pre-CCV MsgChannelOpenInit",
+			ctx:            sdk.Context{},
+			consumerKeeper: consumerKeeper{channelExists: false},
+			msgs: []sdk.Msg{
+				&ibcchanneltypes.MsgChannelOpenInit{PortId: "transfer", Channel: ibcchanneltypes.Channel{Counterparty: ibcchanneltypes.Counterparty{PortId: "transfer"}, ConnectionHops: []string{"connection-0"}}},
+			},
+			expectErr: true,
+		},
+		{
+			name:           "invalid pre-CCV MsgChannelOpenInit",
+			ctx:            sdk.Context{},
+			consumerKeeper: consumerKeeper{channelExists: false},
+			msgs: []sdk.Msg{
+				&ibcchanneltypes.MsgChannelOpenInit{PortId: "consumer", Channel: ibcchanneltypes.Channel{Counterparty: ibcchanneltypes.Counterparty{PortId: "provider"}, ConnectionHops: []string{"connection-1"}}},
+			},
+			expectErr: true,
+		},
+		{
+			name:           "valid pre-CCV MsgChannelOpenInit",
+			ctx:            sdk.Context{},
+			consumerKeeper: consumerKeeper{channelExists: false},
+			msgs: []sdk.Msg{
+				&ibcchanneltypes.MsgChannelOpenInit{PortId: "consumer", Channel: ibcchanneltypes.Channel{Counterparty: ibcchanneltypes.Counterparty{PortId: "provider"}, ConnectionHops: []string{"connection-0"}}},
 			},
 			expectErr: false,
 		},

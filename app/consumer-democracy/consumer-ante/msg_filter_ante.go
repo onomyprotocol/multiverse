@@ -5,6 +5,8 @@ import (
 	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	ibcconnectiontypes "github.com/cosmos/ibc-go/v4/modules/core/03-connection/types"
+	ibcchanneltypes "github.com/cosmos/ibc-go/v4/modules/core/04-channel/types"
 )
 
 type (
@@ -43,6 +45,24 @@ func (mfd MsgFilterDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 func hasValidMsgsPreCCV(msgs []sdk.Msg) bool {
 	for _, msg := range msgs {
 		msgType := sdk.MsgTypeURL(msg)
+
+		// We want to make sure that the first connection and channel are the correct ICS opening,
+		// so that the IBC denom can be deterministic. 07-tendermint-0 is automatically created
+		// for ICS setup, we need to make sure that connection-0 is to this client, and that
+		// channel-0 uses the right ports and connection-0. ICS automatically creates the
+		// connection-1 for transfer port. The port id, channel id, and denom name are used for
+		// hash for IBC denom. Orderings and other fields are checked by preexisting checks in ICS
+		switch msg := msg.(type) {
+		case *ibcconnectiontypes.MsgConnectionOpenInit:
+			if msg.ClientId != "07-tendermint-0" {
+				return false
+			}
+		case *ibcchanneltypes.MsgChannelOpenInit:
+			if (msg.PortId != "consumer") || (msg.Channel.Counterparty.PortId != "provider") || (len(msg.Channel.ConnectionHops) != 1) || (msg.Channel.ConnectionHops[0] != "connection-0") {
+				return false
+			}
+		default:
+		}
 
 		// Only accept IBC messages prior to the CCV channel being established.
 		// Note, rather than listing out all possible IBC message types, we assume
