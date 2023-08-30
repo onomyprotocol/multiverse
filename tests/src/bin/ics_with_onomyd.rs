@@ -17,7 +17,9 @@ use onomy_test_lib::{
         HermesChainConfig, IbcPair,
     },
     onomy_std_init, reprefix_bech32,
-    setups::{cosmovisor_add_consumer, marketd_setup, onomyd_setup, test_proposal},
+    setups::{
+        cosmovisor_add_consumer, marketd_setup, onomyd_setup, test_proposal, CosmosSetupOptions,
+    },
     super_orchestrator::{
         docker::{Container, ContainerNetwork, Dockerfile},
         net_message::NetMessenger,
@@ -208,7 +210,9 @@ async fn onomyd_runner(args: &Args) -> Result<()> {
             .stack()
             .stack()?;
 
-    let mnemonic = onomyd_setup(daemon_home, None).await.stack()?;
+    let mnemonic = onomyd_setup(CosmosSetupOptions::new(daemon_home))
+        .await
+        .stack()?;
     // send mnemonic to hermes
     nm_hermes.send::<String>(&mnemonic).await.stack()?;
 
@@ -264,7 +268,7 @@ async fn onomyd_runner(args: &Args) -> Result<()> {
         .cosmovisor_ibc_transfer(
             "validator",
             &reprefix_bech32(addr, CONSUMER_ACCOUNT_PREFIX).stack()?,
-            &token18(100.0e3, ""),
+            &token18(5.0e3, ""),
             "anom",
         )
         .await
