@@ -8,7 +8,7 @@ require (
 	// NOTE: the canonical consumer version can be different from the producer, check the ICS repo
 	github.com/cosmos/interchain-security v1.2.0-multiden
 	github.com/gorilla/mux v1.8.0
-	github.com/pendulum-labs/market v0.1.1
+	github.com/pendulum-labs/market v0.1.3 // NOTE: change the version in the replace line
 	github.com/rakyll/statik v0.1.7
 	github.com/spf13/cast v1.5.1
 	github.com/stretchr/testify v1.8.3
@@ -154,7 +154,7 @@ replace (
 	github.com/cosmos/cosmos-sdk => github.com/cosmos/cosmos-sdk v0.45.16-ics
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 	github.com/keybase/go-keychain => github.com/99designs/go-keychain v0.0.0-20191008050251-8e49817e8af4
-	github.com/pendulum-labs/market => github.com/onomyprotocol/market v0.1.1
+	github.com/pendulum-labs/market => github.com/onomyprotocol/market v0.1.3
 	github.com/tendermint/tendermint => github.com/cometbft/cometbft v0.34.28
 	google.golang.org/grpc => google.golang.org/grpc v1.33.2
 )
