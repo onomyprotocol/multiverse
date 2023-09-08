@@ -80,17 +80,6 @@ async fn container_runner(args: &Args) -> Result<()> {
         .await
         .stack()?;
 
-    // prepare hermes config
-    write_hermes_config(
-        &[
-            HermesChainConfig::new("onomy", "onomy", false, "anom", true),
-            HermesChainConfig::new(CONSUMER_ID, CONSUMER_ACCOUNT_PREFIX, true, "anative", true),
-        ],
-        &format!("{dockerfiles_dir}/dockerfile_resources"),
-    )
-    .await
-    .stack()?;
-
     let entrypoint = Some(format!(
         "./target/{container_target}/release/{bin_entrypoint}"
     ));
@@ -135,10 +124,39 @@ async fn container_runner(args: &Args) -> Result<()> {
         true,
         logs_dir,
     )
-    .stack()?
-    .add_common_volumes(&[(logs_dir, "/logs")]);
+    .stack()?;
+    cn.add_common_volumes(&[(logs_dir, "/logs")]);
+    let uuid = cn.uuid_as_string();
+    cn.add_common_entrypoint_args(&["--uuid", &uuid]);
+
+    // prepare hermes config
+    write_hermes_config(
+        &[
+            HermesChainConfig::new(
+                "onomy",
+                &format!("onomyd_{uuid}"),
+                "onomy",
+                false,
+                "anom",
+                true,
+            ),
+            HermesChainConfig::new(
+                CONSUMER_ID,
+                &format!("{}_{}", consumer_binary_name(), uuid),
+                CONSUMER_ACCOUNT_PREFIX,
+                true,
+                "anative",
+                true,
+            ),
+        ],
+        &format!("{dockerfiles_dir}/dockerfile_resources"),
+    )
+    .await
+    .stack()?;
+
     cn.run_all(true).await.stack()?;
     cn.wait_with_timeout_all(true, TIMEOUT).await.stack()?;
+    cn.terminate_all().await;
     Ok(())
 }
 
@@ -199,16 +217,21 @@ async fn hermes_runner(args: &Args) -> Result<()> {
 }
 
 async fn onomyd_runner(args: &Args) -> Result<()> {
+    let uuid = &args.uuid;
     let consumer_id = CONSUMER_ID;
     let daemon_home = args.daemon_home.as_ref().stack()?;
-    let mut nm_hermes = NetMessenger::connect(STD_TRIES, STD_DELAY, "hermes:26000")
-        .await
-        .stack()?;
-    let mut nm_consumer =
-        NetMessenger::connect(STD_TRIES, STD_DELAY, &format!("{consumer_id}d:26001"))
+    let mut nm_hermes =
+        NetMessenger::connect(STD_TRIES, STD_DELAY, &format!("hermes_{uuid}:26000"))
             .await
-            .stack()
             .stack()?;
+    let mut nm_consumer = NetMessenger::connect(
+        STD_TRIES,
+        STD_DELAY,
+        &format!("{}_{}:26001", consumer_binary_name(), uuid),
+    )
+    .await
+    .stack()
+    .stack()?;
 
     let mnemonic = onomyd_setup(CosmosSetupOptions::new(daemon_home))
         .await
