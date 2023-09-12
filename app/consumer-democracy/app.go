@@ -113,6 +113,9 @@ import (
 	marketmodule "github.com/pendulum-labs/market/x/market"
 	marketmodulekeeper "github.com/pendulum-labs/market/x/market/keeper"
 	marketmoduletypes "github.com/pendulum-labs/market/x/market/types"
+
+	"github.com/onomyprotocol/multiverse/docs"
+	"github.com/tendermint/starport/starport/pkg/openapiconsole"
 )
 
 const (
@@ -871,6 +874,10 @@ func (app *App) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig
 	// Register legacy and grpc-gateway routes for all modules.
 	ModuleBasics.RegisterRESTRoutes(clientCtx, apiSvr.Router)
 	ModuleBasics.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
+
+	// register app's OpenAPI routes.
+	apiSvr.Router.Handle("/static/openapi.yml", http.FileServer(http.FS(docs.Docs)))
+	apiSvr.Router.HandleFunc("/", openapiconsole.Handler(AppName, "/static/openapi.yml"))
 
 	// register swagger API from root so that other applications can override easily
 	if apiConfig.Swagger {
