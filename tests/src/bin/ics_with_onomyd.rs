@@ -2,7 +2,7 @@ use std::time::Duration;
 
 use common::{
     consumer_binary_name, consumer_directory, dockerfile_onomyd, CONSUMER_ACCOUNT_PREFIX,
-    CONSUMER_ID, CONSUMER_TYPE, CONSUMER_VERSION, PROVIDER_ACCOUNT_PREFIX,
+    CONSUMER_ID, CONSUMER_VERSION, PROVIDER_ACCOUNT_PREFIX,
 };
 use log::info;
 use onomy_test_lib::{
@@ -45,12 +45,12 @@ async fn main() -> Result<()> {
             _ => Err(Error::from(format!("entry_name \"{s}\" is not recognized"))),
         }
     } else {
-        sh(&format!("go build ./cmd/{CONSUMER_TYPE}"), &[])
-            .await
-            .stack()?;
+        sh(&format!("make build"), &[]).await.stack()?;
         sh(
             &format!(
-                "cp ./{CONSUMER_TYPE} ./tests/dockerfiles/dockerfile_resources/{CONSUMER_ID}d"
+                "mv ./{} ./tests/dockerfiles/dockerfile_resources/{}",
+                consumer_binary_name(),
+                consumer_binary_name()
             ),
             &[],
         )
