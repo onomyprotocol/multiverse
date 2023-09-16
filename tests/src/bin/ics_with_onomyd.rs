@@ -477,7 +477,7 @@ async fn consumer(args: &Args) -> Result<()> {
         )
         .await
         .stack()?;
-    market.cancel_order(5).await.stack()?;
+    market.cancel_order(6).await.stack()?;
 
     let pubkey = sh_cosmovisor("tendermint show-validator", &[])
         .await
