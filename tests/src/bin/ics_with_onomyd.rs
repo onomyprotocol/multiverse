@@ -433,7 +433,7 @@ async fn consumer(args: &Args) -> Result<()> {
 
     let coin_pair = CoinPair::new("anative", ibc_nom).stack()?;
     let mut market = Market::new("validator", &format!("1000000{ibc_nom}"));
-    market.max_gas = Some(u256!(300000));
+    market.max_gas = Some(u256!(1000000));
     market
         .create_pool(&coin_pair, Market::MAX_COIN, Market::MAX_COIN)
         .await
