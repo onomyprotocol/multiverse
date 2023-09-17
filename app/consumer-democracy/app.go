@@ -8,7 +8,7 @@ import (
 	"os"
 	"path/filepath"
 
-	// v0 "github.com/onomyprotocol/multiverse/app/consumer-democracy/upgrades/"
+	v0_1_1_199_onex_dummy "github.com/onomyprotocol/multiverse/app/consumer-democracy/upgrades/v0.1.1.199-onex-dummy"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
@@ -909,7 +909,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 }
 
 func (app *App) setupUpgradeHandlers() {
-	// app.UpgradeKeeper.SetUpgradeHandler(v0.Name, v0.UpgradeHandler)
+	app.UpgradeKeeper.SetUpgradeHandler(v0_1_1_199_onex_dummy.Name, v0_1_1_199_onex_dummy.UpgradeHandler)
 
 	upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
 	if err != nil {
