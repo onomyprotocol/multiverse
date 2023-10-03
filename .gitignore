@@ -3,6 +3,4 @@
 /vendor
 /target
 /Cargo.lock
-/consumer-democracy
-/consumer
-/standalone
+/appnamed

@@ -2,7 +2,7 @@ use std::time::Duration;
 
 use common::{
     consumer_binary_name, consumer_directory, dockerfile_onomyd, CONSUMER_ACCOUNT_PREFIX,
-    CONSUMER_ID, CONSUMER_TYPE, CONSUMER_VERSION, PROVIDER_ACCOUNT_PREFIX,
+    CONSUMER_ID, CONSUMER_VERSION, PROVIDER_ACCOUNT_PREFIX,
 };
 use log::info;
 use onomy_test_lib::{
@@ -48,12 +48,12 @@ async fn main() -> Result<()> {
             _ => Err(Error::from(format!("entry_name \"{s}\" is not recognized"))),
         }
     } else {
-        sh(&format!("go build ./cmd/{CONSUMER_TYPE}"), &[])
-            .await
-            .stack()?;
+        sh(&format!("make build"), &[]).await.stack()?;
         sh(
             &format!(
-                "cp ./{CONSUMER_TYPE} ./tests/dockerfiles/dockerfile_resources/{CONSUMER_ID}d"
+                "mv ./{} ./tests/dockerfiles/dockerfile_resources/{}",
+                consumer_binary_name(),
+                consumer_binary_name()
             ),
             &[],
         )
@@ -82,17 +82,6 @@ async fn container_runner(args: &Args) -> Result<()> {
     remove_files_in_dir("./tests/resources/keyring-test/", &[".address", ".info"])
         .await
         .stack()?;
-
-    // prepare hermes config
-    write_hermes_config(
-        &[
-            HermesChainConfig::new("onomy", "onomy", false, "anom", true),
-            HermesChainConfig::new(CONSUMER_ID, CONSUMER_ACCOUNT_PREFIX, true, "anative", true),
-        ],
-        &format!("{dockerfiles_dir}/dockerfile_resources"),
-    )
-    .await
-    .stack()?;
 
     let entrypoint = Some(format!(
         "./target/{container_target}/release/{bin_entrypoint}"
@@ -138,10 +127,39 @@ async fn container_runner(args: &Args) -> Result<()> {
         true,
         logs_dir,
     )
-    .stack()?
-    .add_common_volumes(&[(logs_dir, "/logs")]);
+    .stack()?;
+    cn.add_common_volumes(&[(logs_dir, "/logs")]);
+    let uuid = cn.uuid_as_string();
+    cn.add_common_entrypoint_args(&["--uuid", &uuid]);
+
+    // prepare hermes config
+    write_hermes_config(
+        &[
+            HermesChainConfig::new(
+                "onomy",
+                &format!("onomyd_{uuid}"),
+                "onomy",
+                false,
+                "anom",
+                true,
+            ),
+            HermesChainConfig::new(
+                CONSUMER_ID,
+                &format!("{}_{}", consumer_binary_name(), uuid),
+                CONSUMER_ACCOUNT_PREFIX,
+                true,
+                "anative",
+                true,
+            ),
+        ],
+        &format!("{dockerfiles_dir}/dockerfile_resources"),
+    )
+    .await
+    .stack()?;
+
     cn.run_all(true).await.stack()?;
     cn.wait_with_timeout_all(true, TIMEOUT).await.stack()?;
+    cn.terminate_all().await;
     Ok(())
 }
 
@@ -202,16 +220,21 @@ async fn hermes_runner(args: &Args) -> Result<()> {
 }
 
 async fn onomyd_runner(args: &Args) -> Result<()> {
+    let uuid = &args.uuid;
     let consumer_id = CONSUMER_ID;
     let daemon_home = args.daemon_home.as_ref().stack()?;
-    let mut nm_hermes = NetMessenger::connect(STD_TRIES, STD_DELAY, "hermes:26000")
-        .await
-        .stack()?;
-    let mut nm_consumer =
-        NetMessenger::connect(STD_TRIES, STD_DELAY, &format!("{consumer_id}d:26001"))
+    let mut nm_hermes =
+        NetMessenger::connect(STD_TRIES, STD_DELAY, &format!("hermes_{uuid}:26000"))
             .await
-            .stack()
             .stack()?;
+    let mut nm_consumer = NetMessenger::connect(
+        STD_TRIES,
+        STD_DELAY,
+        &format!("{}_{}:26001", consumer_binary_name(), uuid),
+    )
+    .await
+    .stack()
+    .stack()?;
 
     let mut options = CosmosSetupOptions::new(daemon_home);
     options.large_test_amount = true;
@@ -410,7 +433,7 @@ async fn consumer(args: &Args) -> Result<()> {
 
     let coin_pair = CoinPair::new("anative", ibc_nom).stack()?;
     let mut market = Market::new("validator", &format!("1000000{ibc_nom}"));
-    market.max_gas = Some(u256!(300000));
+    market.max_gas = Some(u256!(1000000));
     market
         .create_pool(&coin_pair, Market::MAX_COIN, Market::MAX_COIN)
         .await
@@ -454,7 +477,7 @@ async fn consumer(args: &Args) -> Result<()> {
         )
         .await
         .stack()?;
-    market.cancel_order(5).await.stack()?;
+    market.cancel_order(6).await.stack()?;
 
     let pubkey = sh_cosmovisor("tendermint show-validator", &[])
         .await
