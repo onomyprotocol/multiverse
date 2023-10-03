@@ -1,6 +1,5 @@
 use onomy_test_lib::dockerfiles::onomy_std_cosmos_daemon_with_arbitrary;
 
-pub const CONSUMER_TYPE: &str = "consumer-democracy";
 pub const CONSUMER_ID: &str = "appname";
 pub const CONSUMER_VERSION: &str = "v0.1.0";
 pub const PROVIDER_ACCOUNT_PREFIX: &str = "onomy";

@@ -8,8 +8,9 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/cosmos/cosmos-sdk/x/params/types/proposal"
+	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	app "github.com/onomyprotocol/multiverse/app/consumer-democracy"
-	"github.com/onomyprotocol/multiverse/app/consumer-democracy/consumer-democracy-ante"
+	ante "github.com/onomyprotocol/multiverse/app/consumer-democracy/consumer-democracy-ante"
 	"github.com/stretchr/testify/require"
 	"github.com/tendermint/spm/cosmoscmd"
 )
@@ -68,6 +69,22 @@ func TestForbiddenProposalsDecorator(t *testing.T) {
 			},
 			expectErr: true,
 		},
+		{
+			name: "Upgrade Proposal",
+			ctx:  sdk.Context{},
+			msgs: []sdk.Msg{
+				newUpgradeProposalMsg(),
+			},
+			expectErr: false,
+		},
+		{
+			name: "Cancel Upgrade Proposal",
+			ctx:  sdk.Context{},
+			msgs: []sdk.Msg{
+				newCancelUpgradeProposalMsg(),
+			},
+			expectErr: false,
+		},
 	}
 
 	for _, tc := range testCases {
@@ -93,5 +110,17 @@ func TestForbiddenProposalsDecorator(t *testing.T) {
 func newParamChangeProposalMsg(changes []proposal.ParamChange) *govtypes.MsgSubmitProposal {
 	paramChange := proposal.ParameterChangeProposal{Changes: changes}
 	msg, _ := govtypes.NewMsgSubmitProposal(&paramChange, sdk.NewCoins(), sdk.AccAddress{})
+	return msg
+}
+
+func newUpgradeProposalMsg() *govtypes.MsgSubmitProposal {
+	upgrade := upgradetypes.SoftwareUpgradeProposal{}
+	msg, _ := govtypes.NewMsgSubmitProposal(&upgrade, sdk.NewCoins(), sdk.AccAddress{})
+	return msg
+}
+
+func newCancelUpgradeProposalMsg() *govtypes.MsgSubmitProposal {
+	upgrade := upgradetypes.CancelSoftwareUpgradeProposal{}
+	msg, _ := govtypes.NewMsgSubmitProposal(&upgrade, sdk.NewCoins(), sdk.AccAddress{})
 	return msg
 }
