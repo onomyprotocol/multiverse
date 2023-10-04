@@ -45,7 +45,7 @@ async fn main() -> Result<()> {
             _ => Err(Error::from(format!("entry_name \"{s}\" is not recognized"))),
         }
     } else {
-        sh(&format!("make build"), &[]).await.stack()?;
+        sh("make build", &[]).await.stack()?;
         sh(
             &format!(
                 "mv ./{} ./tests/dockerfiles/dockerfile_resources/{}",
