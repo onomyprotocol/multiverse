@@ -34,6 +34,7 @@ use onomy_test_lib::{
     },
     yaml_str_to_json_value, Args, ONOMY_IBC_NOM, TEST_AMOUNT, TIMEOUT,
 };
+use serde_json::json;
 use tokio::time::sleep;
 
 #[tokio::main]
@@ -48,7 +49,7 @@ async fn main() -> Result<()> {
             _ => Err(Error::from(format!("entry_name \"{s}\" is not recognized"))),
         }
     } else {
-        sh(&format!("make build"), &[]).await.stack()?;
+        sh("make build", &[]).await.stack()?;
         sh(
             &format!(
                 "mv ./{} ./tests/dockerfiles/dockerfile_resources/{}",
@@ -418,7 +419,7 @@ async fn consumer(args: &Args) -> Result<()> {
     info!("sending back to {}", test_addr);
 
     // avoid conflict with hermes relayer
-    wait_for_num_blocks(4).await.stack()?;
+    wait_for_num_blocks(5).await.stack()?;
 
     // send some IBC NOM back to origin chain using it as gas
     ibc_pair
@@ -426,7 +427,7 @@ async fn consumer(args: &Args) -> Result<()> {
         .cosmovisor_ibc_transfer("validator", test_addr, "5000", ibc_nom)
         .await
         .stack()?;
-    wait_for_num_blocks(4).await.stack()?;
+    wait_for_num_blocks(5).await.stack()?;
 
     // market module specific sanity checks (need to check all tx commands
     // specifically to make sure permissions are correct)
@@ -514,13 +515,32 @@ async fn consumer(args: &Args) -> Result<()> {
     // termination signal
     nm_onomyd.recv::<()>().await.stack()?;
 
-    // but first, test governance with IBC NOM as the token
-    let test_crisis_denom = ONOMY_IBC_NOM;
-    let test_deposit = token18(2000.0, ONOMY_IBC_NOM);
     wait_for_num_blocks(1).await.stack()?;
+
+    // test a simple text proposal
+    let test_deposit = token18(500.0, ONOMY_IBC_NOM);
+    let proposal = json!({
+        "title": "Text Proposal",
+        "description": "a text proposal",
+        "type": "Text",
+        "deposit": test_deposit
+    });
     cosmovisor_gov_file_proposal(
         daemon_home,
-        "param-change",
+        None,
+        &proposal.to_string(),
+        &format!("1{ibc_nom}"),
+    )
+    .await
+    .stack()?;
+    let proposals = sh_cosmovisor("query gov proposals", &[]).await.stack()?;
+    assert!(proposals.contains("PROPOSAL_STATUS_PASSED"));
+
+    // but first, test governance with IBC NOM as the token
+    let test_crisis_denom = ONOMY_IBC_NOM;
+    cosmovisor_gov_file_proposal(
+        daemon_home,
+        Some("param-change"),
         &format!(
             r#"
     {{
