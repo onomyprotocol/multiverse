@@ -67,6 +67,9 @@ import (
 	ibctransferkeeper "github.com/cosmos/ibc-go/v4/modules/apps/transfer/keeper"
 	ibctransfertypes "github.com/cosmos/ibc-go/v4/modules/apps/transfer/types"
 	ibc "github.com/cosmos/ibc-go/v4/modules/core"
+	ibcclient "github.com/cosmos/ibc-go/v4/modules/core/02-client"
+	ibcclientclient "github.com/cosmos/ibc-go/v4/modules/core/02-client/client"
+	ibcclienttypes "github.com/cosmos/ibc-go/v4/modules/core/02-client/types"
 	porttypes "github.com/cosmos/ibc-go/v4/modules/core/05-port/types"
 	ibchost "github.com/cosmos/ibc-go/v4/modules/core/24-host"
 	ibckeeper "github.com/cosmos/ibc-go/v4/modules/core/keeper"
@@ -139,6 +142,8 @@ var (
 		mint.AppModuleBasic{},
 		ccvdistr.AppModuleBasic{},
 		gov.NewAppModuleBasic(
+			ibcclientclient.UpdateClientProposalHandler,
+			ibcclientclient.UpgradeProposalHandler,
 			// TODO: eventually remove upgrade proposal handler and cancel proposal handler
 			paramsclient.ProposalHandler, distrclient.ProposalHandler, upgradeclient.ProposalHandler, upgradeclient.CancelProposalHandler,
 		),
@@ -391,13 +396,24 @@ func New(
 		stakingtypes.NewMultiStakingHooks(app.DistrKeeper.Hooks()),
 	)
 
+	app.IBCKeeper = ibckeeper.NewKeeper(
+		appCodec,
+		keys[ibchost.StoreKey],
+		app.GetSubspace(ibchost.ModuleName),
+		&app.ConsumerKeeper,
+		app.UpgradeKeeper,
+		scopedIBCKeeper,
+	)
+
 	// register the proposal types
 	ccvgovRouter := govtypes.NewRouter()
 	ccvgovRouter.AddRoute(govtypes.RouterKey, govtypes.ProposalHandler).
 		AddRoute(paramproposal.RouterKey, params.NewParamChangeProposalHandler(app.ParamsKeeper)).
 		AddRoute(distrtypes.RouterKey, distr.NewCommunityPoolSpendProposalHandler(app.DistrKeeper)).
 		// TODO: remove upgrade handler from gov once admin module or decision for only signaling proposal is made.
-		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.UpgradeKeeper))
+		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.UpgradeKeeper)).
+		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(app.IBCKeeper.ClientKeeper))
+
 	govKeeper := govkeeper.NewKeeper(
 		appCodec, keys[govtypes.StoreKey], app.GetSubspace(govtypes.ModuleName), app.AccountKeeper, app.BankKeeper,
 		&ccvstakingKeeper, ccvgovRouter,
@@ -407,15 +423,6 @@ func New(
 		govtypes.NewMultiGovHooks(
 		// register the governance hooks
 		),
-	)
-
-	app.IBCKeeper = ibckeeper.NewKeeper(
-		appCodec,
-		keys[ibchost.StoreKey],
-		app.GetSubspace(ibchost.ModuleName),
-		&app.ConsumerKeeper,
-		app.UpgradeKeeper,
-		scopedIBCKeeper,
 	)
 
 	// Create CCV consumer and modules
