@@ -18,7 +18,6 @@ use onomy_test_lib::{
         hermes_set_gas_price_denom, hermes_start, sh_hermes, write_hermes_config,
         HermesChainConfig, IbcPair,
     },
-    market::{CoinPair, Market},
     onomy_std_init, reprefix_bech32,
     setups::{
         cosmovisor_add_consumer, marketd_setup, onomyd_setup, test_proposal, CosmosSetupOptions,
@@ -32,7 +31,7 @@ use onomy_test_lib::{
     },
     token18, u64_array_bigints,
     u64_array_bigints::u256,
-    yaml_str_to_json_value, Args, ONOMY_IBC_NOM, STD_DELAY, STD_TRIES, TIMEOUT,
+    yaml_str_to_json_value, Args, ONOMY_IBC_NOM, STD_DELAY, STD_TRIES, TEST_AMOUNT, TIMEOUT,
 };
 use serde_json::json;
 use tokio::time::sleep;

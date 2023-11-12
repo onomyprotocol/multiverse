@@ -29350,7 +29350,7 @@ paths:
                     beg_time:
                       type: string
                       format: int64
-                    end_time:
+                    upd_time:
                       type: string
                       format: int64
               pagination:
@@ -29524,6 +29524,40 @@ paths:
             type: string
           collectionFormat: csv
           minItems: 1
+      tags:
+        - Query
+  /pendulum-labs/market/market/burned:
+    get:
+      summary: Queries total burned.
+      operationId: PendulumlabsMarketMarketBurned
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              denom:
+                type: string
+              amount:
+                type: string
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
       tags:
         - Query
   /pendulum-labs/market/market/burnings:
@@ -30205,7 +30239,7 @@ paths:
                     beg_time:
                       type: string
                       format: int64
-                    end_time:
+                    upd_time:
                       type: string
                       format: int64
               pagination:
@@ -30536,7 +30570,7 @@ paths:
                     beg_time:
                       type: string
                       format: int64
-                    end_time:
+                    upd_time:
                       type: string
                       format: int64
               pagination:
@@ -30792,7 +30826,7 @@ paths:
                     beg_time:
                       type: string
                       format: int64
-                    end_time:
+                    upd_time:
                       type: string
                       format: int64
               pagination:
@@ -30934,7 +30968,7 @@ paths:
                   beg_time:
                     type: string
                     format: int64
-                  end_time:
+                  upd_time:
                     type: string
                     format: int64
         default:
@@ -31037,6 +31071,20 @@ paths:
                       type: string
                     denom2:
                       type: string
+                    volume1:
+                      type: object
+                      properties:
+                        denom:
+                          type: string
+                        amount:
+                          type: string
+                    volume2:
+                      type: object
+                      properties:
+                        denom:
+                          type: string
+                        amount:
+                          type: string
                     leaders:
                       type: array
                       items:
@@ -31164,6 +31212,20 @@ paths:
                     type: string
                   denom2:
                     type: string
+                  volume1:
+                    type: object
+                    properties:
+                      denom:
+                        type: string
+                      amount:
+                        type: string
+                  volume2:
+                    type: object
+                    properties:
+                      denom:
+                        type: string
+                      amount:
+                        type: string
                   leaders:
                     type: array
                     items:
@@ -31249,6 +31311,156 @@ paths:
           required: true
           type: string
         - name: amount
+          in: path
+          required: true
+          type: string
+      tags:
+        - Query
+  /pendulum-labs/market/market/volume:
+    get:
+      summary: Queries all Volumes.
+      operationId: PendulumlabsMarketMarketVolumeAll
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              volumes:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    denom:
+                      type: string
+                    amount:
+                      type: string
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    title: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+      tags:
+        - Query
+  '/pendulum-labs/market/market/volume/{denom}':
+    get:
+      summary: Queries a Volume by index.
+      operationId: PendulumlabsMarketMarketVolume
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              amount:
+                type: string
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: denom
           in: path
           required: true
           type: string
@@ -50784,7 +50996,7 @@ definitions:
       beg_time:
         type: string
         format: int64
-      end_time:
+      upd_time:
         type: string
         format: int64
   pendulumlabs.market.market.OrderResponse:
@@ -50818,7 +51030,7 @@ definitions:
       beg_time:
         type: string
         format: int64
-      end_time:
+      upd_time:
         type: string
         format: int64
   pendulumlabs.market.market.Orders:
@@ -50856,6 +51068,20 @@ definitions:
         type: string
       denom2:
         type: string
+      volume1:
+        type: object
+        properties:
+          denom:
+            type: string
+          amount:
+            type: string
+      volume2:
+        type: object
+        properties:
+          denom:
+            type: string
+          amount:
+            type: string
       leaders:
         type: array
         items:
@@ -50970,6 +51196,20 @@ definitions:
               type: string
             denom2:
               type: string
+            volume1:
+              type: object
+              properties:
+                denom:
+                  type: string
+                amount:
+                  type: string
+            volume2:
+              type: object
+              properties:
+                denom:
+                  type: string
+                amount:
+                  type: string
             leaders:
               type: array
               items:
@@ -50984,6 +51224,43 @@ definitions:
             history:
               type: string
               format: uint64
+      pagination:
+        type: object
+        properties:
+          next_key:
+            type: string
+            format: byte
+            title: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently
+          total:
+            type: string
+            format: uint64
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
+  pendulumlabs.market.market.QueryAllVolumeResponse:
+    type: object
+    properties:
+      volumes:
+        type: array
+        items:
+          type: object
+          properties:
+            denom:
+              type: string
+            amount:
+              type: string
       pagination:
         type: object
         properties:
@@ -51045,7 +51322,7 @@ definitions:
             beg_time:
               type: string
               format: int64
-            end_time:
+            upd_time:
               type: string
               format: int64
       pagination:
@@ -51092,6 +51369,13 @@ definitions:
       next:
         type: string
         format: uint64
+  pendulumlabs.market.market.QueryBurnedResponse:
+    type: object
+    properties:
+      denom:
+        type: string
+      amount:
+        type: string
   pendulumlabs.market.market.QueryDropAmountsResponse:
     type: object
     properties:
@@ -51226,6 +51510,20 @@ definitions:
             type: string
           denom2:
             type: string
+          volume1:
+            type: object
+            properties:
+              denom:
+                type: string
+              amount:
+                type: string
+          volume2:
+            type: object
+            properties:
+              denom:
+                type: string
+              amount:
+                type: string
           leaders:
             type: array
             items:
@@ -51276,7 +51574,7 @@ definitions:
             beg_time:
               type: string
               format: int64
-            end_time:
+            upd_time:
               type: string
               format: int64
       pagination:
@@ -51374,7 +51672,7 @@ definitions:
           beg_time:
             type: string
             format: int64
-          end_time:
+          upd_time:
             type: string
             format: int64
   pendulumlabs.market.market.QueryOrdersResponse:
@@ -51413,7 +51711,7 @@ definitions:
             beg_time:
               type: string
               format: int64
-            end_time:
+            upd_time:
               type: string
               format: int64
       pagination:
@@ -51464,6 +51762,18 @@ definitions:
             title: 'market_fee (parameter / 10000), 9999 representing as 99.99%'
     description: QueryParamsResponse is response type for the Query/Params RPC method.
   pendulumlabs.market.market.QueryQuoteResponse:
+    type: object
+    properties:
+      denom:
+        type: string
+      amount:
+        type: string
+  pendulumlabs.market.market.QueryVolumeResponse:
+    type: object
+    properties:
+      amount:
+        type: string
+  pendulumlabs.market.market.Volume:
     type: object
     properties:
       denom:
