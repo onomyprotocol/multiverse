@@ -8,7 +8,6 @@ import (
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	"github.com/cosmos/cosmos-sdk/x/params/types/proposal"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	ibctransfertypes "github.com/cosmos/ibc-go/v4/modules/apps/transfer/types"
 	consumertypes "github.com/cosmos/interchain-security/x/ccv/consumer/types"
 )
@@ -17,13 +16,8 @@ func IsProposalWhitelisted(content govtypes.Content) bool {
 	switch c := content.(type) {
 	case *proposal.ParameterChangeProposal:
 		return isParamChangeWhitelisted(c.Changes)
-	case *upgradetypes.SoftwareUpgradeProposal:
-		return true
-	case *upgradetypes.CancelSoftwareUpgradeProposal:
-		return true
-
 	default:
-		return false
+		return true
 	}
 }
 
