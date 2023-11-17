@@ -115,10 +115,15 @@ import (
 	_ "github.com/cosmos/cosmos-sdk/client/docs/statik"
 	"github.com/onomyprotocol/multiverse/docs"
 	"github.com/tendermint/starport/starport/pkg/openapiconsole"
+
+	marketmodule "github.com/pendulum-labs/market/x/market"
+	marketmodulekeeper "github.com/pendulum-labs/market/x/market/keeper"
+	marketmoduletypes "github.com/pendulum-labs/market/x/market/types"
 )
 
 const (
-	AppName              = "appname"
+	AppName              = "onex"
+	upgradeName          = "v0.1.0"
 	AccountAddressPrefix = "onomy"
 )
 
@@ -154,6 +159,7 @@ var (
 		vesting.AppModuleBasic{},
 		// router.AppModuleBasic{},
 		consumer.AppModuleBasic{},
+		marketmodule.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -162,11 +168,12 @@ var (
 		stakingtypes.BondedPoolName:                {authtypes.Burner, authtypes.Staking},
 		stakingtypes.NotBondedPoolName:             {authtypes.Burner, authtypes.Staking},
 		distrtypes.ModuleName:                      nil,
-		minttypes.ModuleName:                       {authtypes.Minter},
+		minttypes.ModuleName:                       {authtypes.Minter, authtypes.Burner},
 		consumertypes.ConsumerRedistributeName:     nil,
 		consumertypes.ConsumerToSendToProviderName: nil,
 		ibctransfertypes.ModuleName:                {authtypes.Minter, authtypes.Burner},
 		govtypes.ModuleName:                        {authtypes.Burner},
+		marketmoduletypes.ModuleName:               {authtypes.Minter, authtypes.Burner, authtypes.Staking},
 	}
 )
 
@@ -217,6 +224,8 @@ type App struct { // nolint: golint
 	ScopedTransferKeeper    capabilitykeeper.ScopedKeeper
 	ScopedIBCConsumerKeeper capabilitykeeper.ScopedKeeper
 
+	MarketKeeper marketmodulekeeper.Keeper
+
 	// the module manager
 	MM *module.Manager
 
@@ -263,6 +272,7 @@ func New(
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey,
 		capabilitytypes.StoreKey, authzkeeper.StoreKey,
 		consumertypes.StoreKey,
+		marketmoduletypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -476,6 +486,16 @@ func New(
 
 	app.EvidenceKeeper = *evidenceKeeper
 
+	app.MarketKeeper = *marketmodulekeeper.NewKeeper(
+		appCodec,
+		keys[marketmoduletypes.StoreKey],
+		keys[marketmoduletypes.MemStoreKey],
+		app.GetSubspace(marketmoduletypes.ModuleName),
+
+		app.BankKeeper,
+	)
+	marketModule := marketmodule.NewAppModule(appCodec, app.MarketKeeper, app.AccountKeeper, app.BankKeeper)
+
 	skipGenesisInvariants := cast.ToBool(appOpts.Get(crisis.FlagSkipGenesisInvariants))
 
 	// NOTE: Any module instantiated in the module manager that is later modified
@@ -499,6 +519,7 @@ func New(
 		ibc.NewAppModule(app.IBCKeeper),
 		transferModule,
 		consumerModule,
+		marketModule,
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -526,6 +547,7 @@ func New(
 		vestingtypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		ibchost.ModuleName,
+		marketmoduletypes.ModuleName,
 		consumertypes.ModuleName,
 	)
 	app.MM.SetOrderEndBlockers(
@@ -546,6 +568,7 @@ func New(
 		vestingtypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		ibchost.ModuleName,
+		marketmoduletypes.ModuleName,
 		consumertypes.ModuleName,
 	)
 
@@ -573,6 +596,7 @@ func New(
 		vestingtypes.ModuleName,
 		ibchost.ModuleName,
 		ibctransfertypes.ModuleName,
+		marketmoduletypes.ModuleName,
 		consumertypes.ModuleName,
 	)
 
@@ -600,6 +624,7 @@ func New(
 		evidence.NewAppModule(app.EvidenceKeeper), ibc.NewAppModule(app.IBCKeeper),
 		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
 		transferModule,
+		marketModule,
 	)
 
 	app.sm.RegisterStoreDecoders()
@@ -885,6 +910,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
 	paramsKeeper.Subspace(consumertypes.ModuleName)
+	paramsKeeper.Subspace(marketmoduletypes.ModuleName)
 
 	return paramsKeeper
 }
