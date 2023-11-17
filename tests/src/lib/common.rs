@@ -1,6 +1,6 @@
-use onomy_test_lib::dockerfiles::onomy_std_cosmos_daemon_with_arbitrary;
+use onomy_test_lib::dockerfiles::{onomy_std_cosmos_daemon_with_arbitrary, ONOMYD_VERSION};
 
-pub const PROVIDER_VERSION: &str = "v1.1.2";
+pub const PROVIDER_VERSION: &str = ONOMYD_VERSION;
 pub const CONSUMER_ID: &str = "appname";
 pub const CONSUMER_VERSION: &str = "v0.1.0";
 pub const PROVIDER_ACCOUNT_PREFIX: &str = "onomy";
