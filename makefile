@@ -54,4 +54,4 @@ test:
 
 build:
 	go build $(BUILD_FLAGS) ./cmd/consumer-democracy
-	mv ./consumer-democracy appnamed
+	mv ./consumer-democracy onexd

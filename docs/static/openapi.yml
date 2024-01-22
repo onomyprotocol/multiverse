@@ -29307,6 +29307,2165 @@ paths:
                         }
       tags:
         - Query
+  '/pendulum-labs/market/market/book/{denomA}/{denomB}/{orderType}':
+    get:
+      summary: Queries a list of Book items.
+      operationId: PendulumlabsMarketMarketBook
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              book:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    uid:
+                      type: string
+                      format: uint64
+                    owner:
+                      type: string
+                    status:
+                      type: string
+                    orderType:
+                      type: string
+                    denomAsk:
+                      type: string
+                    denomBid:
+                      type: string
+                    amount:
+                      type: string
+                    rate:
+                      type: array
+                      items:
+                        type: string
+                    prev:
+                      type: string
+                      format: uint64
+                    next:
+                      type: string
+                      format: uint64
+                    beg_time:
+                      type: string
+                      format: int64
+                    upd_time:
+                      type: string
+                      format: int64
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    title: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: denomA
+          in: path
+          required: true
+          type: string
+        - name: denomB
+          in: path
+          required: true
+          type: string
+        - name: orderType
+          in: path
+          required: true
+          type: string
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+      tags:
+        - Query
+  '/pendulum-labs/market/market/bookends/{coinA}/{coinB}/{orderType}/{rate}':
+    get:
+      summary: Queries a list of Bookends items.
+      operationId: PendulumlabsMarketMarketBookends
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              coinA:
+                type: string
+              coinB:
+                type: string
+              orderType:
+                type: string
+              rate:
+                type: array
+                items:
+                  type: string
+              prev:
+                type: string
+                format: uint64
+              next:
+                type: string
+                format: uint64
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: coinA
+          in: path
+          required: true
+          type: string
+        - name: coinB
+          in: path
+          required: true
+          type: string
+        - name: orderType
+          in: path
+          required: true
+          type: string
+        - name: rate
+          in: path
+          required: true
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          minItems: 1
+      tags:
+        - Query
+  /pendulum-labs/market/market/burned:
+    get:
+      summary: Queries total burned.
+      operationId: PendulumlabsMarketMarketBurned
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              denom:
+                type: string
+              amount:
+                type: string
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      tags:
+        - Query
+  /pendulum-labs/market/market/burnings:
+    get:
+      summary: Queries a list of Burnings items.
+      operationId: PendulumlabsMarketMarketBurningsAll
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              burnings:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    denom:
+                      type: string
+                    amount:
+                      type: string
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    title: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+      tags:
+        - Query
+  '/pendulum-labs/market/market/burnings/{denom}':
+    get:
+      summary: Queries a Burnings by index.
+      operationId: PendulumlabsMarketMarketBurnings
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              burnings:
+                type: object
+                properties:
+                  denom:
+                    type: string
+                  amount:
+                    type: string
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: denom
+          in: path
+          required: true
+          type: string
+      tags:
+        - Query
+  /pendulum-labs/market/market/drop:
+    get:
+      summary: Queries a list of Drop items.
+      operationId: PendulumlabsMarketMarketDropAll
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              drops:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    uid:
+                      type: string
+                      format: uint64
+                    owner:
+                      type: string
+                    pair:
+                      type: string
+                    drops:
+                      type: string
+                    product:
+                      type: string
+                    active:
+                      type: boolean
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    title: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+      tags:
+        - Query
+  '/pendulum-labs/market/market/drop/amounts/{uid}':
+    get:
+      summary: Queries a Drop by index.
+      operationId: PendulumlabsMarketMarketDropAmounts
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              denom1:
+                type: string
+              denom2:
+                type: string
+              amount1:
+                type: string
+              amount2:
+                type: string
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: uid
+          in: path
+          required: true
+          type: string
+          format: uint64
+      tags:
+        - Query
+  '/pendulum-labs/market/market/drop/coin/{denomA}/{denomB}/{amountA}':
+    get:
+      summary: Queries a Drop by index.
+      operationId: PendulumlabsMarketMarketDropCoin
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              drops:
+                type: string
+              amountB:
+                type: string
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: denomA
+          in: path
+          required: true
+          type: string
+        - name: denomB
+          in: path
+          required: true
+          type: string
+        - name: amountA
+          in: path
+          required: true
+          type: string
+      tags:
+        - Query
+  '/pendulum-labs/market/market/drop/coins/{pair}/{drops}':
+    get:
+      summary: Converts drops to coin amounts
+      operationId: PendulumlabsMarketMarketDropsToCoins
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              denom1:
+                type: string
+              denom2:
+                type: string
+              amount1:
+                type: string
+              amount2:
+                type: string
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: pair
+          in: path
+          required: true
+          type: string
+        - name: drops
+          in: path
+          required: true
+          type: string
+      tags:
+        - Query
+  '/pendulum-labs/market/market/drop/pairs/{address}':
+    get:
+      summary: Queries a Drop by index.
+      operationId: PendulumlabsMarketMarketDropPairs
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              pairs:
+                type: array
+                items:
+                  type: string
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: address
+          in: path
+          required: true
+          type: string
+      tags:
+        - Query
+  '/pendulum-labs/market/market/drop/{address}/{pair}':
+    get:
+      summary: Queries a Drop by index.
+      operationId: PendulumlabsMarketMarketDropOwnerPair
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              drops:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    uid:
+                      type: string
+                      format: uint64
+                    owner:
+                      type: string
+                    pair:
+                      type: string
+                    drops:
+                      type: string
+                    product:
+                      type: string
+                    active:
+                      type: boolean
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    title: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: address
+          in: path
+          required: true
+          type: string
+        - name: pair
+          in: path
+          required: true
+          type: string
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+      tags:
+        - Query
+  '/pendulum-labs/market/market/drop/{uid}':
+    get:
+      summary: Queries a Drop by index.
+      operationId: PendulumlabsMarketMarketDrop
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              drop:
+                type: object
+                properties:
+                  uid:
+                    type: string
+                    format: uint64
+                  owner:
+                    type: string
+                  pair:
+                    type: string
+                  drops:
+                    type: string
+                  product:
+                    type: string
+                  active:
+                    type: boolean
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: uid
+          in: path
+          required: true
+          type: string
+          format: uint64
+      tags:
+        - Query
+  '/pendulum-labs/market/market/history/{pair}':
+    get:
+      summary: Queries pool trade history.
+      operationId: PendulumlabsMarketMarketHistory
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              history:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    uid:
+                      type: string
+                      format: uint64
+                    owner:
+                      type: string
+                    status:
+                      type: string
+                    orderType:
+                      type: string
+                    denomAsk:
+                      type: string
+                    denomBid:
+                      type: string
+                    amount:
+                      type: string
+                    rate:
+                      type: array
+                      items:
+                        type: string
+                    prev:
+                      type: string
+                      format: uint64
+                    next:
+                      type: string
+                      format: uint64
+                    beg_time:
+                      type: string
+                      format: int64
+                    upd_time:
+                      type: string
+                      format: int64
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    title: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: pair
+          in: path
+          required: true
+          type: string
+        - name: length
+          in: query
+          required: false
+          type: string
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+      tags:
+        - Query
+  /pendulum-labs/market/market/member:
+    get:
+      summary: Queries a list of Member items.
+      operationId: PendulumlabsMarketMarketMemberAll
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              member:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    pair:
+                      type: string
+                    denomA:
+                      type: string
+                    denomB:
+                      type: string
+                    balance:
+                      type: string
+                    previous:
+                      type: string
+                    limit:
+                      type: string
+                      format: uint64
+                    stop:
+                      type: string
+                      format: uint64
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    title: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+      tags:
+        - Query
+  '/pendulum-labs/market/market/member/{denomA}/{denomB}':
+    get:
+      summary: Queries a Member by index.
+      operationId: PendulumlabsMarketMarketMember
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              member:
+                type: object
+                properties:
+                  pair:
+                    type: string
+                  denomA:
+                    type: string
+                  denomB:
+                    type: string
+                  balance:
+                    type: string
+                  previous:
+                    type: string
+                  limit:
+                    type: string
+                    format: uint64
+                  stop:
+                    type: string
+                    format: uint64
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: denomA
+          in: path
+          required: true
+          type: string
+        - name: denomB
+          in: path
+          required: true
+          type: string
+      tags:
+        - Query
+  /pendulum-labs/market/market/order:
+    get:
+      summary: Queries a list of Order items.
+      operationId: PendulumlabsMarketMarketOrderAll
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              orders:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    uid:
+                      type: string
+                      format: uint64
+                    owner:
+                      type: string
+                    status:
+                      type: string
+                    orderType:
+                      type: string
+                    denomAsk:
+                      type: string
+                    denomBid:
+                      type: string
+                    amount:
+                      type: string
+                    rate:
+                      type: array
+                      items:
+                        type: string
+                    prev:
+                      type: string
+                      format: uint64
+                    next:
+                      type: string
+                      format: uint64
+                    beg_time:
+                      type: string
+                      format: int64
+                    upd_time:
+                      type: string
+                      format: int64
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    title: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+      tags:
+        - Query
+  '/pendulum-labs/market/market/order/uids/{address}':
+    get:
+      summary: Queries a list of Order items.
+      operationId: PendulumlabsMarketMarketOrderOwnerUids
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              orders:
+                type: object
+                properties:
+                  uids:
+                    type: array
+                    items:
+                      type: string
+                      format: uint64
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    title: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: address
+          in: path
+          required: true
+          type: string
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+      tags:
+        - Query
+  '/pendulum-labs/market/market/order/{address}':
+    get:
+      summary: Queries a list of Order items.
+      operationId: PendulumlabsMarketMarketOrderOwner
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              orders:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    uid:
+                      type: string
+                      format: uint64
+                    owner:
+                      type: string
+                    status:
+                      type: string
+                    orderType:
+                      type: string
+                    denomAsk:
+                      type: string
+                    denomBid:
+                      type: string
+                    amount:
+                      type: string
+                    rate:
+                      type: array
+                      items:
+                        type: string
+                    prev:
+                      type: string
+                      format: uint64
+                    next:
+                      type: string
+                      format: uint64
+                    beg_time:
+                      type: string
+                      format: int64
+                    upd_time:
+                      type: string
+                      format: int64
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    title: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: address
+          in: path
+          required: true
+          type: string
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+      tags:
+        - Query
+  '/pendulum-labs/market/market/order/{uid}':
+    get:
+      summary: Queries a Order by index.
+      operationId: PendulumlabsMarketMarketOrder
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              order:
+                type: object
+                properties:
+                  uid:
+                    type: string
+                    format: uint64
+                  owner:
+                    type: string
+                  status:
+                    type: string
+                  orderType:
+                    type: string
+                  denomAsk:
+                    type: string
+                  denomBid:
+                    type: string
+                  amount:
+                    type: string
+                  rate:
+                    type: array
+                    items:
+                      type: string
+                  prev:
+                    type: string
+                    format: uint64
+                  next:
+                    type: string
+                    format: uint64
+                  beg_time:
+                    type: string
+                    format: int64
+                  upd_time:
+                    type: string
+                    format: int64
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: uid
+          in: path
+          required: true
+          type: string
+          format: uint64
+      tags:
+        - Query
+  /pendulum-labs/market/market/params:
+    get:
+      summary: Parameters queries the parameters of the module.
+      operationId: PendulumlabsMarketMarketParams
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              params:
+                description: params holds all the parameters of this module.
+                type: object
+                properties:
+                  earn_rates:
+                    type: string
+                    title: |-
+                      leader earnings rates
+                      1,2,3 Comma separated, no space
+                  burn_rate:
+                    type: string
+                    title: pool burning rate
+                  burn_coin:
+                    type: string
+                    title: burn coin
+                  market_fee:
+                    type: string
+                    title: >-
+                      market_fee (parameter / 10000), 9999 representing as
+                      99.99%
+            description: >-
+              QueryParamsResponse is response type for the Query/Params RPC
+              method.
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      tags:
+        - Query
+  /pendulum-labs/market/market/pool:
+    get:
+      summary: Queries a list of Pool items.
+      operationId: PendulumlabsMarketMarketPoolAll
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              pool:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    pair:
+                      type: string
+                    denom1:
+                      type: string
+                    denom2:
+                      type: string
+                    volume1:
+                      type: object
+                      properties:
+                        denom:
+                          type: string
+                        amount:
+                          type: string
+                    volume2:
+                      type: object
+                      properties:
+                        denom:
+                          type: string
+                        amount:
+                          type: string
+                    leaders:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          address:
+                            type: string
+                          drops:
+                            type: string
+                    drops:
+                      type: string
+                    history:
+                      type: string
+                      format: uint64
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    title: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+      tags:
+        - Query
+  '/pendulum-labs/market/market/pool/{pair}':
+    get:
+      summary: Queries a Pool by index.
+      operationId: PendulumlabsMarketMarketPool
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              pool:
+                type: object
+                properties:
+                  pair:
+                    type: string
+                  denom1:
+                    type: string
+                  denom2:
+                    type: string
+                  volume1:
+                    type: object
+                    properties:
+                      denom:
+                        type: string
+                      amount:
+                        type: string
+                  volume2:
+                    type: object
+                    properties:
+                      denom:
+                        type: string
+                      amount:
+                        type: string
+                  leaders:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        address:
+                          type: string
+                        drops:
+                          type: string
+                  drops:
+                    type: string
+                  history:
+                    type: string
+                    format: uint64
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: pair
+          in: path
+          required: true
+          type: string
+      tags:
+        - Query
+  '/pendulum-labs/market/market/quote/{denomBid}/{denomAsk}/{denomAmount}/{amount}':
+    get:
+      summary: Queries pool trade history.
+      operationId: PendulumlabsMarketMarketQuote
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              denom:
+                type: string
+              amount:
+                type: string
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: denomBid
+          in: path
+          required: true
+          type: string
+        - name: denomAsk
+          in: path
+          required: true
+          type: string
+        - name: denomAmount
+          in: path
+          required: true
+          type: string
+        - name: amount
+          in: path
+          required: true
+          type: string
+      tags:
+        - Query
+  /pendulum-labs/market/market/volume:
+    get:
+      summary: Queries all Volumes.
+      operationId: PendulumlabsMarketMarketVolumeAll
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              volumes:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    denom:
+                      type: string
+                    amount:
+                      type: string
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    title: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+      tags:
+        - Query
+  '/pendulum-labs/market/market/volume/{denom}':
+    get:
+      summary: Queries a Volume by index.
+      operationId: PendulumlabsMarketMarketVolume
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              amount:
+                type: string
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: denom
+          in: path
+          required: true
+          type: string
+      tags:
+        - Query
 definitions:
   cosmos.auth.v1beta1.Params:
     type: object
@@ -48734,3 +50893,890 @@ definitions:
               which are allowed to be used as rewards. e.g. "uatom"
         title: Params defines the parameters for CCV consumer module
     description: QueryParamsResponse is response type for the Query/Params RPC method.
+  pendulumlabs.market.market.Burnings:
+    type: object
+    properties:
+      denom:
+        type: string
+      amount:
+        type: string
+  pendulumlabs.market.market.Drop:
+    type: object
+    properties:
+      uid:
+        type: string
+        format: uint64
+      owner:
+        type: string
+      pair:
+        type: string
+      drops:
+        type: string
+      product:
+        type: string
+      active:
+        type: boolean
+  pendulumlabs.market.market.Leader:
+    type: object
+    properties:
+      address:
+        type: string
+      drops:
+        type: string
+  pendulumlabs.market.market.Member:
+    type: object
+    properties:
+      pair:
+        type: string
+      denomA:
+        type: string
+      denomB:
+        type: string
+      balance:
+        type: string
+      previous:
+        type: string
+      limit:
+        type: string
+        format: uint64
+      stop:
+        type: string
+        format: uint64
+  pendulumlabs.market.market.MsgCancelOrderResponse:
+    type: object
+  pendulumlabs.market.market.MsgCreateDropResponse:
+    type: object
+  pendulumlabs.market.market.MsgCreateOrderResponse:
+    type: object
+    properties:
+      uid:
+        type: string
+        format: uint64
+  pendulumlabs.market.market.MsgCreatePoolResponse:
+    type: object
+  pendulumlabs.market.market.MsgMarketOrderResponse:
+    type: object
+    properties:
+      amountBid:
+        type: string
+      amountAsk:
+        type: string
+      slippage:
+        type: string
+  pendulumlabs.market.market.MsgRedeemDropResponse:
+    type: object
+  pendulumlabs.market.market.Order:
+    type: object
+    properties:
+      uid:
+        type: string
+        format: uint64
+      owner:
+        type: string
+      status:
+        type: string
+      orderType:
+        type: string
+      denomAsk:
+        type: string
+      denomBid:
+        type: string
+      amount:
+        type: string
+      rate:
+        type: array
+        items:
+          type: string
+      prev:
+        type: string
+        format: uint64
+      next:
+        type: string
+        format: uint64
+      beg_time:
+        type: string
+        format: int64
+      upd_time:
+        type: string
+        format: int64
+  pendulumlabs.market.market.OrderResponse:
+    type: object
+    properties:
+      uid:
+        type: string
+        format: uint64
+      owner:
+        type: string
+      status:
+        type: string
+      orderType:
+        type: string
+      denomAsk:
+        type: string
+      denomBid:
+        type: string
+      amount:
+        type: string
+      rate:
+        type: array
+        items:
+          type: string
+      prev:
+        type: string
+        format: uint64
+      next:
+        type: string
+        format: uint64
+      beg_time:
+        type: string
+        format: int64
+      upd_time:
+        type: string
+        format: int64
+  pendulumlabs.market.market.Orders:
+    type: object
+    properties:
+      uids:
+        type: array
+        items:
+          type: string
+          format: uint64
+  pendulumlabs.market.market.Params:
+    type: object
+    properties:
+      earn_rates:
+        type: string
+        title: |-
+          leader earnings rates
+          1,2,3 Comma separated, no space
+      burn_rate:
+        type: string
+        title: pool burning rate
+      burn_coin:
+        type: string
+        title: burn coin
+      market_fee:
+        type: string
+        title: 'market_fee (parameter / 10000), 9999 representing as 99.99%'
+    description: Params defines the parameters for the module.
+  pendulumlabs.market.market.Pool:
+    type: object
+    properties:
+      pair:
+        type: string
+      denom1:
+        type: string
+      denom2:
+        type: string
+      volume1:
+        type: object
+        properties:
+          denom:
+            type: string
+          amount:
+            type: string
+      volume2:
+        type: object
+        properties:
+          denom:
+            type: string
+          amount:
+            type: string
+      leaders:
+        type: array
+        items:
+          type: object
+          properties:
+            address:
+              type: string
+            drops:
+              type: string
+      drops:
+        type: string
+      history:
+        type: string
+        format: uint64
+  pendulumlabs.market.market.QueryAllBurningsResponse:
+    type: object
+    properties:
+      burnings:
+        type: array
+        items:
+          type: object
+          properties:
+            denom:
+              type: string
+            amount:
+              type: string
+      pagination:
+        type: object
+        properties:
+          next_key:
+            type: string
+            format: byte
+            title: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently
+          total:
+            type: string
+            format: uint64
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
+  pendulumlabs.market.market.QueryAllMemberResponse:
+    type: object
+    properties:
+      member:
+        type: array
+        items:
+          type: object
+          properties:
+            pair:
+              type: string
+            denomA:
+              type: string
+            denomB:
+              type: string
+            balance:
+              type: string
+            previous:
+              type: string
+            limit:
+              type: string
+              format: uint64
+            stop:
+              type: string
+              format: uint64
+      pagination:
+        type: object
+        properties:
+          next_key:
+            type: string
+            format: byte
+            title: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently
+          total:
+            type: string
+            format: uint64
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
+  pendulumlabs.market.market.QueryAllPoolResponse:
+    type: object
+    properties:
+      pool:
+        type: array
+        items:
+          type: object
+          properties:
+            pair:
+              type: string
+            denom1:
+              type: string
+            denom2:
+              type: string
+            volume1:
+              type: object
+              properties:
+                denom:
+                  type: string
+                amount:
+                  type: string
+            volume2:
+              type: object
+              properties:
+                denom:
+                  type: string
+                amount:
+                  type: string
+            leaders:
+              type: array
+              items:
+                type: object
+                properties:
+                  address:
+                    type: string
+                  drops:
+                    type: string
+            drops:
+              type: string
+            history:
+              type: string
+              format: uint64
+      pagination:
+        type: object
+        properties:
+          next_key:
+            type: string
+            format: byte
+            title: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently
+          total:
+            type: string
+            format: uint64
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
+  pendulumlabs.market.market.QueryAllVolumeResponse:
+    type: object
+    properties:
+      volumes:
+        type: array
+        items:
+          type: object
+          properties:
+            denom:
+              type: string
+            amount:
+              type: string
+      pagination:
+        type: object
+        properties:
+          next_key:
+            type: string
+            format: byte
+            title: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently
+          total:
+            type: string
+            format: uint64
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
+  pendulumlabs.market.market.QueryBookResponse:
+    type: object
+    properties:
+      book:
+        type: array
+        items:
+          type: object
+          properties:
+            uid:
+              type: string
+              format: uint64
+            owner:
+              type: string
+            status:
+              type: string
+            orderType:
+              type: string
+            denomAsk:
+              type: string
+            denomBid:
+              type: string
+            amount:
+              type: string
+            rate:
+              type: array
+              items:
+                type: string
+            prev:
+              type: string
+              format: uint64
+            next:
+              type: string
+              format: uint64
+            beg_time:
+              type: string
+              format: int64
+            upd_time:
+              type: string
+              format: int64
+      pagination:
+        type: object
+        properties:
+          next_key:
+            type: string
+            format: byte
+            title: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently
+          total:
+            type: string
+            format: uint64
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
+  pendulumlabs.market.market.QueryBookendsResponse:
+    type: object
+    properties:
+      coinA:
+        type: string
+      coinB:
+        type: string
+      orderType:
+        type: string
+      rate:
+        type: array
+        items:
+          type: string
+      prev:
+        type: string
+        format: uint64
+      next:
+        type: string
+        format: uint64
+  pendulumlabs.market.market.QueryBurnedResponse:
+    type: object
+    properties:
+      denom:
+        type: string
+      amount:
+        type: string
+  pendulumlabs.market.market.QueryDropAmountsResponse:
+    type: object
+    properties:
+      denom1:
+        type: string
+      denom2:
+        type: string
+      amount1:
+        type: string
+      amount2:
+        type: string
+  pendulumlabs.market.market.QueryDropCoinResponse:
+    type: object
+    properties:
+      drops:
+        type: string
+      amountB:
+        type: string
+  pendulumlabs.market.market.QueryDropPairsResponse:
+    type: object
+    properties:
+      pairs:
+        type: array
+        items:
+          type: string
+  pendulumlabs.market.market.QueryDropResponse:
+    type: object
+    properties:
+      drop:
+        type: object
+        properties:
+          uid:
+            type: string
+            format: uint64
+          owner:
+            type: string
+          pair:
+            type: string
+          drops:
+            type: string
+          product:
+            type: string
+          active:
+            type: boolean
+  pendulumlabs.market.market.QueryDropsResponse:
+    type: object
+    properties:
+      drops:
+        type: array
+        items:
+          type: object
+          properties:
+            uid:
+              type: string
+              format: uint64
+            owner:
+              type: string
+            pair:
+              type: string
+            drops:
+              type: string
+            product:
+              type: string
+            active:
+              type: boolean
+      pagination:
+        type: object
+        properties:
+          next_key:
+            type: string
+            format: byte
+            title: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently
+          total:
+            type: string
+            format: uint64
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
+  pendulumlabs.market.market.QueryGetBurningsResponse:
+    type: object
+    properties:
+      burnings:
+        type: object
+        properties:
+          denom:
+            type: string
+          amount:
+            type: string
+  pendulumlabs.market.market.QueryGetMemberResponse:
+    type: object
+    properties:
+      member:
+        type: object
+        properties:
+          pair:
+            type: string
+          denomA:
+            type: string
+          denomB:
+            type: string
+          balance:
+            type: string
+          previous:
+            type: string
+          limit:
+            type: string
+            format: uint64
+          stop:
+            type: string
+            format: uint64
+  pendulumlabs.market.market.QueryGetPoolResponse:
+    type: object
+    properties:
+      pool:
+        type: object
+        properties:
+          pair:
+            type: string
+          denom1:
+            type: string
+          denom2:
+            type: string
+          volume1:
+            type: object
+            properties:
+              denom:
+                type: string
+              amount:
+                type: string
+          volume2:
+            type: object
+            properties:
+              denom:
+                type: string
+              amount:
+                type: string
+          leaders:
+            type: array
+            items:
+              type: object
+              properties:
+                address:
+                  type: string
+                drops:
+                  type: string
+          drops:
+            type: string
+          history:
+            type: string
+            format: uint64
+  pendulumlabs.market.market.QueryHistoryResponse:
+    type: object
+    properties:
+      history:
+        type: array
+        items:
+          type: object
+          properties:
+            uid:
+              type: string
+              format: uint64
+            owner:
+              type: string
+            status:
+              type: string
+            orderType:
+              type: string
+            denomAsk:
+              type: string
+            denomBid:
+              type: string
+            amount:
+              type: string
+            rate:
+              type: array
+              items:
+                type: string
+            prev:
+              type: string
+              format: uint64
+            next:
+              type: string
+              format: uint64
+            beg_time:
+              type: string
+              format: int64
+            upd_time:
+              type: string
+              format: int64
+      pagination:
+        type: object
+        properties:
+          next_key:
+            type: string
+            format: byte
+            title: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently
+          total:
+            type: string
+            format: uint64
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
+  pendulumlabs.market.market.QueryOrderOwnerUidsResponse:
+    type: object
+    properties:
+      orders:
+        type: object
+        properties:
+          uids:
+            type: array
+            items:
+              type: string
+              format: uint64
+      pagination:
+        type: object
+        properties:
+          next_key:
+            type: string
+            format: byte
+            title: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently
+          total:
+            type: string
+            format: uint64
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
+  pendulumlabs.market.market.QueryOrderResponse:
+    type: object
+    properties:
+      order:
+        type: object
+        properties:
+          uid:
+            type: string
+            format: uint64
+          owner:
+            type: string
+          status:
+            type: string
+          orderType:
+            type: string
+          denomAsk:
+            type: string
+          denomBid:
+            type: string
+          amount:
+            type: string
+          rate:
+            type: array
+            items:
+              type: string
+          prev:
+            type: string
+            format: uint64
+          next:
+            type: string
+            format: uint64
+          beg_time:
+            type: string
+            format: int64
+          upd_time:
+            type: string
+            format: int64
+  pendulumlabs.market.market.QueryOrdersResponse:
+    type: object
+    properties:
+      orders:
+        type: array
+        items:
+          type: object
+          properties:
+            uid:
+              type: string
+              format: uint64
+            owner:
+              type: string
+            status:
+              type: string
+            orderType:
+              type: string
+            denomAsk:
+              type: string
+            denomBid:
+              type: string
+            amount:
+              type: string
+            rate:
+              type: array
+              items:
+                type: string
+            prev:
+              type: string
+              format: uint64
+            next:
+              type: string
+              format: uint64
+            beg_time:
+              type: string
+              format: int64
+            upd_time:
+              type: string
+              format: int64
+      pagination:
+        type: object
+        properties:
+          next_key:
+            type: string
+            format: byte
+            title: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently
+          total:
+            type: string
+            format: uint64
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
+  pendulumlabs.market.market.QueryParamsResponse:
+    type: object
+    properties:
+      params:
+        description: params holds all the parameters of this module.
+        type: object
+        properties:
+          earn_rates:
+            type: string
+            title: |-
+              leader earnings rates
+              1,2,3 Comma separated, no space
+          burn_rate:
+            type: string
+            title: pool burning rate
+          burn_coin:
+            type: string
+            title: burn coin
+          market_fee:
+            type: string
+            title: 'market_fee (parameter / 10000), 9999 representing as 99.99%'
+    description: QueryParamsResponse is response type for the Query/Params RPC method.
+  pendulumlabs.market.market.QueryQuoteResponse:
+    type: object
+    properties:
+      denom:
+        type: string
+      amount:
+        type: string
+  pendulumlabs.market.market.QueryVolumeResponse:
+    type: object
+    properties:
+      amount:
+        type: string
+  pendulumlabs.market.market.Volume:
+    type: object
+    properties:
+      denom:
+        type: string
+      amount:
+        type: string
