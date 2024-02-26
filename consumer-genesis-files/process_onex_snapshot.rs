@@ -200,7 +200,7 @@ async fn main() -> Result<()> {
     }
 
     // Exclude accounts with bonded amounts less than 100 NOM
-    allocations.retain(|_, amount| *amount > 100_000000000000000000);
+    allocations.retain(|_, amount| *amount >= 100_000000000000000000);
 
     #[rustfmt::skip]
     /*
@@ -213,7 +213,7 @@ async fn main() -> Result<()> {
     cosmovisor run tx staking delegate onomyvaloper1yks83spz6lvrrys8kh0untt22399tskkx4l7y6 500000000000000000034aonex --from special -y -b block --gas 300000 --fees 10000000ibc/5872224386C093865E42B18BDDA56BCB8CDE1E36B82B391E97697520053B0513
     */
 
-    let local_target_time: chrono::DateTime<chrono_tz::Tz>  = chrono::TimeZone::with_ymd_and_hms(&chrono_tz::US::Central, 2023, 12, 29, 10, 0, 0)
+    let local_target_time: chrono::DateTime<chrono_tz::Tz>  = chrono::TimeZone::with_ymd_and_hms(&chrono_tz::US::Central, 2024, 3, 4, 10, 0, 0)
         .single()
         .stack()?;
     let utc_target_time = local_target_time.with_timezone(&chrono::Utc);
